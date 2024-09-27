@@ -36,7 +36,7 @@ endif()
 
 # Examples
 if (RAYLIB_NUKLEAR_BUILD_EXAMPLES)
-#    add_subdirectory(examples)
+    add_subdirectory(examples)
 
     # Testing
     include(CTest)
