@@ -6,20 +6,37 @@ project(raylib_nuklear
     LANGUAGES C
 )
 
-# raylib-nuklear
-add_subdirectory(include)
-
 # Options
 if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
     set(RAYLIB_NUKLEAR_IS_MAIN TRUE)
 else()
     set(RAYLIB_NUKLEAR_IS_MAIN FALSE)
 endif()
+
 option(RAYLIB_NUKLEAR_BUILD_EXAMPLES "Examples" ${RAYLIB_NUKLEAR_IS_MAIN})
+option(CREATE_SHARED_LIBRARY "Build shared raylib-nuklear library" OFF)
+
+if (CREATE_SHARED_LIBRARY)
+    if (MSVC)
+        set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON CACHE BOOL "Export all symbols" FORCE)
+    endif()
+    set(RAYLIB_NUKLEAR_BUILD_EXAMPLES OFF CACHE BOOL "Never build examples when generates shared libraries" FORCE)
+endif()
+
+# raylib-nuklear
+add_subdirectory(include)
+
+if (CREATE_SHARED_LIBRARY)
+    add_subdirectory(lib)
+endif()
+
+if(NOT MSVC)
+    link_libraries(m)
+endif()
 
 # Examples
 if (RAYLIB_NUKLEAR_BUILD_EXAMPLES)
-    add_subdirectory(examples)
+#    add_subdirectory(examples)
 
     # Testing
     include(CTest)
