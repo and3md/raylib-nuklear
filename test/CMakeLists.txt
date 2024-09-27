@@ -1,10 +1,11 @@
 # raylib-nuklear-test
 add_executable(raylib-nuklear-test raylib-nuklear-test.c)
+if (MSVC)
+target_compile_options(raylib-nuklear-test PRIVATE -Wall)
+else()
 target_compile_options(raylib-nuklear-test PRIVATE -Wall -Wextra -Wconversion -Wsign-conversion)
-target_link_libraries(raylib-nuklear-test PUBLIC
-    raylib
-    raylib_nuklear
-)
+endif()
+target_link_libraries(raylib-nuklear-test PUBLIC raylib raylib_nuklear)
 
 # Copy the resources
 file(GLOB resources resources/*)
