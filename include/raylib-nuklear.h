@@ -186,7 +186,9 @@ nk_raylib_font_get_text_width_user_font(nk_handle handle, float height, const ch
         // Spacing is determined by the font size divided by 10.
         // Raylib only counts the spacing between characters, but Nuklear expects one spacing to be
         // counter for every character in the string:
-        return MeasureTextEx(*(Font*)handle.ptr, subtext, height, height / 10.0f).x + height / 10.0f;
+        //return MeasureTextEx(*(Font*)handle.ptr, subtext, height, height / 10.0f).x + height / 10.0f;
+        // The text is too wide with this
+        return MeasureTextEx(*(Font*)handle.ptr, subtext, height, 0.0f).x;
     }
 
     return 0;
@@ -636,7 +638,9 @@ DrawNuklear(struct nk_context * ctx)
                 Font* font = (Font*)text->font->userdata.ptr;
                 if (font != NULL) {
                     Vector2 position = {(float)text->x * scale, (float)text->y * scale};
-                    DrawTextEx(*font, (const char*)text->string, position, fontSize, fontSize / 10.0f, color);
+                    // The text is too wide with this
+                    // DrawTextEx(*font, (const char*)text->string, position, fontSize, fontSize / 10.0f, color);
+                    DrawTextEx(*font, (const char*)text->string, position, fontSize, 0.0f, color);
                 }
                 else {
                     DrawText((const char*)text->string, (int)(text->x * scale), (int)(text->y * scale), (int)fontSize, color);
