@@ -66,6 +66,8 @@ NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update th
 NK_API void UpdateNuklearEx(struct nk_context * ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
 NK_API void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
 NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
+NK_API struct nk_user_font* FontToNuklear(Font font);               // Convert a raylib Font to a Nuklear user font object
+NK_API void UnloadNuklearFont(struct nk_user_font* font);           // Free font created with FontToNuklear 
 NK_API struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object
 NK_API struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color
 NK_API struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color
@@ -397,6 +399,37 @@ NK_API Font LoadFontFromNuklear(int size) {
 
     return LoadFontFromMemory(".ttf", RAYLIB_NUKLEAR_DEFAULT_FONT_NAME, RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE, size, NULL, RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS);
 #endif
+}
+
+/**
+ *  Convert a Raylib Font to a Nuklear user font object, Nuklear nk_user_font can't live longer than Raylib Font
+ */
+NK_API struct nk_user_font* FontToNuklear(Font font)
+{
+    struct Font* newFont = (struct Font*)MemAlloc(sizeof(struct Font));
+
+    newFont->baseSize = font.baseSize;
+    newFont->glyphCount = font.glyphCount;
+    newFont->glyphPadding = font.glyphPadding;
+    newFont->glyphs = font.glyphs;
+    newFont->recs = font.recs;
+    newFont->texture = font.texture;
+
+    // Create the nuklear user font.
+    struct nk_user_font* userFont = (struct nk_user_font*)MemAlloc(sizeof(struct nk_user_font));
+    userFont->userdata = nk_handle_ptr(newFont);
+    userFont->height = newFont->baseSize;
+    userFont->width = nk_raylib_font_get_text_width_user_font;
+    return userFont;
+}
+
+/**
+ * Free font created with FontToNuklear  
+ */
+NK_API void UnloadNuklearFont(struct nk_user_font* font)
+{
+    MemFree(font->userdata.ptr);
+    MemFree(font);
 }
 
 /**
